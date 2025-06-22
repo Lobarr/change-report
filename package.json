@@ -1,9 +1,9 @@
 {
   "name": "change-report",
-  "version": "0.0.0",
+  "version": "0.0.2",
   "private": true,
   "description": "GitHub Action to generate a report from the recent code changes and post it to Slack",
-  "main": "lib/main.js",
+  "main": "dist/index.js",
   "scripts": {
     "build": "tsc",
     "format": "prettier --write '**/*.ts'",

@@ -16,6 +16,10 @@ inputs:
     required: true
     description: 'channel to report'
     default: 'general'
+  model_name:
+    required: false
+    description: 'OpenAI model to use for generating the report'
+    default: 'gpt-3.5-turbo'
 runs:
   using: 'node16'
   main: 'dist/index.js'

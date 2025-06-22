@@ -2,13 +2,17 @@ import {OpenAIApi, Configuration} from 'openai'
 
 export const composeReport = async (
   daysCount: number,
-  commitMessagesList: string[]
+  commitMessagesList: string[],
+  modelName?: string
 ): Promise<string> => {
   const OPENAI_API_KEY = process.env.OPENAI_API_KEY!
+  const OPENAI_BASE_URL = process.env.OPENAI_BASE_URL
+  const model = modelName || 'gpt-3.5-turbo'
 
   const openai = new OpenAIApi(
     new Configuration({
-      apiKey: OPENAI_API_KEY
+      apiKey: OPENAI_API_KEY,
+      basePath: OPENAI_BASE_URL
     })
   )
 
@@ -32,7 +36,7 @@ export const composeReport = async (
   ].join('\n')
 
   const response = await openai.createChatCompletion({
-    model: 'gpt-3.5-turbo',
+    model: model,
     messages: [
       {role: 'system', content: systemPrompt},
       {role: 'user', content: userPrompt},
