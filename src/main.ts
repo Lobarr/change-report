@@ -8,6 +8,7 @@ async function run(): Promise<void> {
   try {
     const daysCount = parseInt(core.getInput('days'))
     const modelName = core.getInput('model_name')
+    const maxTokens = parseInt(core.getInput('max_tokens'))
     const commitMessagesList = await fetchCommitMessages(daysCount)
 
     core.info(`Fetched ${commitMessagesList.length} commit messages:`)
@@ -21,7 +22,8 @@ async function run(): Promise<void> {
     const report = await composeReport(
       daysCount,
       commitMessagesList,
-      modelName
+      modelName,
+      maxTokens
     )
     core.info('Generated report:')
     core.info(report)

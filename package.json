@@ -1,6 +1,6 @@
 {
   "name": "change-report",
-  "version": "0.0.2",
+  "version": "0.0.1",
   "private": true,
   "description": "GitHub Action to generate a report from the recent code changes and post it to Slack",
   "main": "dist/index.js",

@@ -3,40 +3,71 @@ import {OpenAIApi, Configuration} from 'openai'
 export const composeReport = async (
   daysCount: number,
   commitMessagesList: string[],
-  modelName?: string
+  modelName: string,
+  maxTokens: number
 ): Promise<string> => {
-  const OPENAI_API_KEY = process.env.OPENAI_API_KEY!
-  const OPENAI_BASE_URL = process.env.OPENAI_BASE_URL
-  const model = modelName || 'gpt-3.5-turbo'
-
   const openai = new OpenAIApi(
     new Configuration({
-      apiKey: OPENAI_API_KEY,
-      basePath: OPENAI_BASE_URL
+      apiKey: process.env.OPENAI_API_KEY,
+      basePath: process.env.OPENAI_BASE_URL
     })
   )
 
-  const systemPrompt = [
-    `You're a software delivery assistant working in a team of software developers (us) developing a software product.`,
-    `You're helping our team to write a report about the key changes that we have made to the project over the last ${daysCount} days.`,
-    `You're writing a report that will be sent to the rest of our team`,
-    `You're taking a list of commit messages as input.`,
-    `Your goal is to remind us of what those important and impactful changes that we've recently done are.`,
-    'Your goal is to make us feel proud of our work when we deliver something important and impactful.',
-    `Your goal is also to push us to do more work when we're not doing much work.`
-  ].join('\n')
-  const userPrompt = [
-    `Write what we've done in the past tense, active voice.`,
-    `Start with a title, then a brief summary of the most important changes.`,
-    `Group by the type of work, order by importance, and use relevant emojis.`,
-    'Squash updates that are not important, or that are too specific into brief summaries.',
-    'Write in simple, casual, witty language.',
-    'Write in plain text, with no formatting.',
-    `Keep it short, summarise changes when there's many of them.`
-  ].join('\n')
+  const systemPrompt = `You are an AI-powered software delivery assistant, expertly integrated into a dynamic software development team.
+    Your core mission is to synthesize comprehensive and engaging reports on our project's evolution over the past ${daysCount} days.
+    These reports are crucial for internal team communication, designed to celebrate our successes and provide a clear overview of recent developments.
+    You will be provided with a raw list of commit messages. Your task is to transform this data into a digestible, inspiring narrative.
+    Beyond simply listing changes, aim to highlight **important and impactful contributions**, fostering a sense of pride and accomplishment within the team.
+    Furthermore, subtly integrate a motivational element: if the detected activity level appears low, gently encourage greater future engagement without being overtly critical.
+  `
+
+  const userPrompt = `**Report Structure and Content:**
+  1.  **Title:** Begin with a concise, catchy title that reflects the reporting period (e.g., "Last Week's Wins," "Sprint Review: Our Latest Achievements").
+  2.  **Overall Summary:** Follow the title with a brief, high-level summary of the most significant and impactful changes across all categories. This should immediately convey the key takeaways.
+  3.  **Categorization & Ordering:** Group related changes under clear, descriptive headings (e.g., "🚀 New Features & Enhancements," "🐛 Bug Squashes & Stability Improvements," "🧹 Refactorings & Technical Debt," "⚡ Performance Optimizations," "📝 Documentation Updates"). Order these categories by their perceived importance or impact on the project, with the most critical updates appearing first.
+  4.  **Detail Level & Conciseness:** For individual updates within categories, provide enough detail to convey the essence of the change without being overly verbose. **Crucially, consolidate minor, trivial, or overly granular commit messages into more meaningful, summarized bullet points.** For example, multiple small bug fixes could be summarized as "Addressed various minor UI glitches across several components." Focus on the *what* and *why* of the change rather than just the *how*.
+  5.  **Language and Tone:** Adopt a **simple, casual, and witty** tone. Use **active voice** throughout to emphasize our team's agency. Inject relevant and engaging **emojis** to enhance readability and make the report more visually appealing and friendly. Maintain a positive and encouraging voice.
+  6.  **Plain Text Formatting:** The entire report, *excluding the Mermaid diagram section*, should be in **plain text**. Avoid any markdown (e.g., bolding, italics, bullet points beyond simple hyphens if necessary), HTML, or other special formatting. Use clear line breaks between sections and bullet points for readability.
+  7.  **Length:** Keep the overall report **short and highly summarized**. If there are a large number of changes, prioritize summarization and focus on the most impactful items rather than listing everything. The goal is quick comprehension, not an exhaustive log.
+
+  ---
+
+  **Mermaid Diagram of System Evolution:**
+  Following the main report, include a separate section titled "System Evolution Diagram (Mermaid)" which contains **only** the Mermaid syntax for a diagram illustrating how key components or modules of the system have evolved based on the major changes identified in the commit messages.
+
+  -   Focus on high-level relationships and changes, not granular details.
+  -   Use flowcharts or class diagrams if appropriate to show dependencies or new components.
+  -   Represent major features, refactorings, or new integrations as nodes or processes.
+  -   Use arrows to show dependencies or flow of changes.
+  -   Keep the diagram concise and readable, representing the most significant architectural or component-level shifts.
+  -   **The output for this section MUST be valid Mermaid syntax. Do not add any explanatory text around the Mermaid code within that section.**
+
+  ---
+
+  **Example of Desired Output Style (conceptual, remember no markdown for the main report):**
+  Weekly Wins!
+  We've had a productive week, rolling out some exciting new features, squashing critical bugs, and giving our performance a nice boost!
+
+  🚀 New Features & Enhancements
+  - Launched the redesigned user dashboard for a smoother experience.
+  - Introduced a new notification system for real-time alerts.
+
+  🐛 Bug Squashes & Stability Improvements
+  - Fixed persistent login issues affecting some users.
+  - Patched several critical security vulnerabilities.
+
+  System Evolution Diagram (Mermaid)
+  graph TD
+      A[Old UI] --> B(New Dashboard Feature);
+      C[Auth Module] --> D{New Notification System};
+      E[Database] --> F[Performance Optimizations];
+      B --> G[API Layer];
+      D --> G;
+      C --> B;
+  `
 
   const response = await openai.createChatCompletion({
-    model: model,
+    model: modelName,
     messages: [
       {role: 'system', content: systemPrompt},
       {role: 'user', content: userPrompt},
@@ -44,7 +75,7 @@ export const composeReport = async (
       {role: 'user', content: commitMessagesList.join('\n')},
       {role: 'assistant', content: 'Report:'}
     ],
-    max_tokens: 300,
+    max_tokens: maxTokens,
     frequency_penalty: 0.5,
     presence_penalty: 0.5,
     temperature: 0.5,
