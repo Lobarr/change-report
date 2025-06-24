@@ -88,6 +88,8 @@ jobs:
           channel: 'general'
           # OpenAI model to use for generating the report (optional, default is gpt-3.5-turbo)
           model_name: 'gpt-3.5-turbo'
+          # The maximum number of tokens to generate for the report (optional, default is 300)
+          max_tokens: 300
         env:
           # Your OpenAI API key, used to generate the report
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
