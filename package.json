@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "description": "GitHub Action to generate a report from the recent code changes and post it to Slack",
-  "main": "dist/index.js",
+  "main": "lib/main.js",
   "scripts": {
     "build": "tsc",
     "format": "prettier --write '**/*.ts'",
