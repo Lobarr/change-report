@@ -16,6 +16,14 @@ inputs:
     required: true
     description: 'channel to report'
     default: 'general'
+  model_name:
+    required: false
+    description: 'OpenAI model to use for generating the report'
+    default: 'gpt-3.5-turbo'
+  max_tokens:
+    required: false
+    description: 'The maximum number of tokens to generate for the report'
+    default: 300
 runs:
   using: 'node16'
   main: 'dist/index.js'
