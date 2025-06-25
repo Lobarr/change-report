@@ -1,4 +1,5 @@
 import {OpenAI, ClientOptions} from 'openai'
+import * as core from '@actions/core'
 
 export const composeReport = async (
   daysCount: number,
@@ -23,7 +24,7 @@ export const composeReport = async (
   `
 
   const userPrompt = `**Report Structure and Content:**
-  1.  **Title:** Use the format "Dev Report for <today's_date_in_YYYY-MM-DD_format>". For example, if today is 2025-06-24, the title should be "Dev Report for 2025-06-24".
+  1.  **Title:** Begin with a concise, catchy title that reflects the reporting period (e.g., "Last Week's Wins," "Sprint Review: Our Latest Achievements").
   2.  **Overall Summary:** Follow the title with a brief, high-level summary of the most significant and impactful changes across all categories. This should immediately convey the key takeaways.
   3.  **Categorization & Ordering:** Group related changes under clear, descriptive headings (e.g., "🚀 New Features & Enhancements," "🐛 Bug Squashes & Stability Improvements," "🧹 Refactorings & Technical Debt," "⚡ Performance Optimizations," "📝 Documentation Updates"). Order these categories by their perceived importance or impact on the project, with the most critical updates appearing first.
   4.  **Detail Level & Conciseness:** For individual updates within categories, provide enough detail to convey the essence of the change without being overly verbose. **Crucially, consolidate minor, trivial, or overly granular commit messages into more meaningful, summarized bullet points.** For example, multiple small bug fixes could be summarized as "Addressed various minor UI glitches across several components." Focus on the *what* and *why* of the change rather than just the *how*.
@@ -34,7 +35,7 @@ export const composeReport = async (
 
 
   **Example of Desired Output Style (conceptual, remember no markdown for the main report):**
-  Dev Report for 2024-07-28 🚀
+  Weekly Wins!
 
   We've had a productive week, rolling out some exciting new features, squashing critical bugs, and giving our performance a nice boost!
 
@@ -47,25 +48,29 @@ export const composeReport = async (
   - Patched several critical security vulnerabilities.
   `
 
-  const completion = await client.chat.completions.create({
-    model: modelName,
-    messages: [
-      {role: 'system', content: systemPrompt},
-      {
-        role: 'user',
-        content: `Today's date is ${new Date().toISOString().slice(0, 10)}.\n\n${userPrompt}`
-      },
-      {role: 'user', content: 'Commit messages:'},
-      {role: 'user', content: commitMessagesList.join('\n\n')},
-      {role: 'assistant', content: 'Report:'}
-    ],
-    max_tokens: maxTokens,
-    frequency_penalty: 0.7,
-    presence_penalty: 0.7,
-    temperature: 0.7,
-    top_p: 1,
-    n: 1
-  })
+  const chatOpts: OpenAI.Chat.Completions.ChatCompletionCreateParamsNonStreaming =
+    {
+      model: modelName,
+      messages: [
+        {role: 'system', content: systemPrompt},
+        {role: 'user', content: userPrompt},
+        {role: 'user', content: 'Commit messages:'},
+        {role: 'user', content: commitMessagesList.join('\n\n')},
+        {role: 'assistant', content: 'Report:'}
+      ],
+      max_tokens: maxTokens,
+      frequency_penalty: 0.7,
+      presence_penalty: 0.7,
+      temperature: 0.7,
+      top_p: 1,
+      n: 1
+    }
+
+  core.debug(
+    `OpenAI completion arguments: ${JSON.stringify(chatOpts, null, 2)}`
+  )
+
+  const completion = await client.chat.completions.create(chatOpts)
 
   return completion.choices[0].message?.content || ''
 }
