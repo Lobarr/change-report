@@ -1,29 +1,35 @@
-import Discord from 'discord.js'
+import {Client, GatewayIntentBits, TextChannel} from 'discord.js'
+import * as core from '@actions/core'
 
 export const sendDiscordMessage = async (
-  channel: string,
+  channelId: string,
   message: string
 ): Promise<void> => {
-  const discord = new Discord.Client({
-    intents: []
+  core.debug(`Sending Discord message to channel ID: ${channelId}`)
+  core.debug(`Message content: ${message}`)
+  const discord = new Client({
+    intents: [GatewayIntentBits.GuildMessages, GatewayIntentBits.DirectMessages]
   })
   await discord.login(process.env.DISCORD_BOT_TOKEN)
+  core.debug('Logged into Discord.')
 
-  const discordChannel = await discord.channels.fetch(String(channel))
+  const discordChannel = await discord.channels.fetch(channelId)
+  core.debug(`Fetched Discord channel: ${discordChannel?.id}`)
 
   if (!discordChannel) {
-    throw new Error(`Discord channel ${channel} not found`)
+    throw new Error(`Discord channel ${channelId} not found`)
   }
 
   if (!discordChannel.isTextBased()) {
-    throw new Error(`Discord channel ${channel} is not text-based`)
+    throw new Error(`Discord channel ${channelId} is not text-based`)
   }
 
-  await discordChannel.send(
-    Discord.MessagePayload.create(discordChannel, {
-      content: message
-    })
-  )
+  const textChannel = discordChannel as TextChannel
+  await textChannel.send({
+    content: message
+  })
+  core.debug('Discord message sent.')
 
   discord.destroy()
+  core.debug('Discord client destroyed.')
 }
