@@ -23,19 +23,19 @@ export const composeReport = async (
   `
 
   const userPrompt = `**Report Structure and Content:**
-  1.  **Title:** Use the format "Proptrust Dev Report for <today's_date_in_YYYY-MM-DD_format>". For example, if today is 2025-06-24, the title should be "Proptrust Dev Report for 2025-06-24".
+  1.  **Title:** Use the format "Dev Report for <today's_date_in_YYYY-MM-DD_format>". For example, if today is 2025-06-24, the title should be "Dev Report for 2025-06-24".
   2.  **Overall Summary:** Follow the title with a brief, high-level summary of the most significant and impactful changes across all categories. This should immediately convey the key takeaways.
   3.  **Categorization & Ordering:** Group related changes under clear, descriptive headings (e.g., "🚀 New Features & Enhancements," "🐛 Bug Squashes & Stability Improvements," "🧹 Refactorings & Technical Debt," "⚡ Performance Optimizations," "📝 Documentation Updates"). Order these categories by their perceived importance or impact on the project, with the most critical updates appearing first.
   4.  **Detail Level & Conciseness:** For individual updates within categories, provide enough detail to convey the essence of the change without being overly verbose. **Crucially, consolidate minor, trivial, or overly granular commit messages into more meaningful, summarized bullet points.** For example, multiple small bug fixes could be summarized as "Addressed various minor UI glitches across several components." Focus on the *what* and *why* of the change rather than just the *how*.
   5.  **Language and Tone:** Adopt a **simple, casual, and witty** tone. Use **active voice** throughout to emphasize our team's agency. Inject relevant and engaging **emojis** to enhance readability and make the report more visually appealing and friendly. Maintain a positive and encouraging voice.
   6.  **Plain Text Formatting:** The entire report, *excluding the Mermaid diagram section*, should be in **plain text**. Avoid any markdown (e.g., bolding, italics, bullet points beyond simple hyphens if necessary), HTML, or other special formatting. Use clear line breaks between sections and bullet points for readability.
   7.  **Length:** Keep the overall report **short and highly summarized**. If there are a large number of changes, prioritize summarization and focus on the most impactful items rather than listing everything. The goal is quick comprehension, not an exhaustive log.
-
   ---
 
 
   **Example of Desired Output Style (conceptual, remember no markdown for the main report):**
-  Proptrust Dev Report for 2024-07-28
+  Dev Report for 2024-07-28 🚀
+
   We've had a productive week, rolling out some exciting new features, squashing critical bugs, and giving our performance a nice boost!
 
   🚀 New Features & Enhancements
