@@ -109,6 +109,7 @@ jobs:
 ### Authors
 
 * **Max Prilutskiy** - [@maxprilutskiy](https://twitter.com/maxprilutskiy)
+* **Lobarr**
 
 
 ### Roadmap

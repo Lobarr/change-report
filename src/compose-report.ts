@@ -1,4 +1,4 @@
-import {OpenAIApi, Configuration} from 'openai'
+import {OpenAI, ClientOptions} from 'openai'
 
 export const composeReport = async (
   daysCount: number,
@@ -6,12 +6,13 @@ export const composeReport = async (
   modelName: string,
   maxTokens: number
 ): Promise<string> => {
-  const openai = new OpenAIApi(
-    new Configuration({
-      apiKey: process.env.OPENAI_API_KEY,
-      basePath: process.env.OPENAI_BASE_URL
-    })
-  )
+  const opts: ClientOptions = {
+    apiKey: process.env.OPENAI_API_KEY
+  }
+  if (process.env.OPENAI_API_BASE_URL) {
+    opts.baseURL = process.env.OPENAI_API_BASE_URL
+  }
+  const client = new OpenAI(opts)
 
   const systemPrompt = `You are an AI-powered software delivery assistant, expertly integrated into a dynamic software development team.
     Your core mission is to synthesize comprehensive and engaging reports on our project's evolution over the past ${daysCount} days.
@@ -66,7 +67,7 @@ export const composeReport = async (
       C --> B;
   `
 
-  const response = await openai.createChatCompletion({
+  const completion = await client.chat.completions.create({
     model: modelName,
     messages: [
       {role: 'system', content: systemPrompt},
@@ -83,7 +84,5 @@ export const composeReport = async (
     n: 1
   })
 
-  const result = response.data.choices[0].message?.content || ''
-
-  return result
+  return completion.choices[0].message?.content || ''
 }

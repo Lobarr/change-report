@@ -7,8 +7,11 @@ import {sendDiscordMessage} from './send-discord-message'
 async function run(): Promise<void> {
   try {
     const daysCount = parseInt(core.getInput('days'))
+    core.debug(`Days count: ${daysCount}`)
     const modelName = core.getInput('model_name')
+    core.debug(`Model name: ${modelName}`)
     const maxTokens = parseInt(core.getInput('max_tokens'))
+    core.debug(`Max tokens: ${maxTokens}`)
     const commitMessagesList = await fetchCommitMessages(daysCount)
 
     core.info(`Fetched ${commitMessagesList.length} commit messages:`)
